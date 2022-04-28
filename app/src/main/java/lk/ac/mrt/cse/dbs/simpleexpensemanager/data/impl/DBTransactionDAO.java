@@ -29,13 +29,16 @@ public class DBTransactionDAO implements TransactionDAO {
     public void logTransaction(Date date, String accountNo, ExpenseType expenseType, double amount) {
         SQLiteDatabase db = dbHandler.getWritableDBInstance();
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String stringDate= dateFormat.format(date);
+
         ContentValues contentValues = new ContentValues();
-        contentValues.put("date", date.toString());
+        contentValues.put("date", stringDate);
         contentValues.put("expense_type", expenseType.toString());
         contentValues.put("amount", amount);
         contentValues.put("account_id", accountNo);
 
-        db.insert("transactions", null, contentValues);
+        long id = db.insert("transactions", null, contentValues);
     }
 
     @Override

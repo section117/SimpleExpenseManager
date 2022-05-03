@@ -51,7 +51,7 @@ public class DBTransactionDAO implements TransactionDAO {
     @Override
     public List<Transaction> getPaginatedTransactionLogs(int limit) {
         SQLiteDatabase db = dbHandler.getReadableDBInstance();
-        Cursor result = db.rawQuery("SELECT * FROM transactions LIMIT "+ limit + "", null);
+        Cursor result = db.rawQuery("SELECT * FROM transactions LIMIT ?", new String[] {Integer.toString(limit)});
         return getTransactionsListFromCursor(result);
     }
 

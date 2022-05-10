@@ -16,14 +16,69 @@
 
 package lk.ac.mrt.cse.dbs.simpleexpensemanager;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import androidx.test.core.app.ApplicationProvider;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.PersistentExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.config.DBHandler;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+public class ApplicationTest{
+
+    private ExpenseManager expenseManager;
+    private String test_account_no;
+
+    @Before
+    public void construct() {
+        DBHandler.createDBHandlerInstance(ApplicationProvider.getApplicationContext());
+        expenseManager = new PersistentExpenseManager();
+        test_account_no = "12345";
+    }
+
+    @Test
+    public void testAddAccount() {
+
+        if(expenseManager.getAccountNumbersList().contains(test_account_no)) {
+            fail("Account with number exists.");
+        }
+
+        try {
+            expenseManager.addAccount(test_account_no, "BOC", "Holder A", 1000);
+        }catch (Exception e) {
+            fail("Account with number exists.");
+        }
+        assertTrue("Added account to the database", expenseManager.getAccountNumbersList().contains(test_account_no));
+    }
+
+    @Test
+    public void testRetrieveAccounts() {
+        assertNotNull("Retrieve a List<String> of account numbers", expenseManager.getAccountNumbersList());
+    }
+
+    @Test
+    public void testUpdateBalance() {
+
+        int count = expenseManager.getTransactionLogs().size();
+
+        try {
+            expenseManager.updateAccountBalance(test_account_no, 5, 6, 2020, ExpenseType.INCOME, "150.34");
+        } catch (Exception e){
+            fail();
+        }
+
+        int new_count = expenseManager.getTransactionLogs().size();
+        assertTrue(new_count == count + 1);
+
+
     }
 }

@@ -29,8 +29,12 @@ public class DBAccountDAO implements AccountDAO {
         Cursor result = db.rawQuery("SELECT account_no FROM accounts", null);
 
         List<String> account_numbers = new LinkedList<>();
-        for (result.moveToFirst(); !result.isAfterLast(); result.moveToNext()) {
-            account_numbers.add(result.getString(result.getColumnIndex("account_no")));
+        try {
+            for (result.moveToFirst(); !result.isAfterLast(); result.moveToNext()) {
+                account_numbers.add(result.getString(result.getColumnIndexOrThrow("account_no")));
+            }
+        }catch (Exception e) {
+            return account_numbers;
         }
         return account_numbers;
     }
@@ -64,12 +68,16 @@ public class DBAccountDAO implements AccountDAO {
         Cursor result = db.rawQuery("SELECT * FROM accounts WHERE account_no=?", new String[] {accountNo});
 
         if(result.moveToFirst()) {
-            return new Account(
-                    result.getString(result.getColumnIndex("account_no")),
-                    result.getString(result.getColumnIndex("bank_name")),
-                    result.getString(result.getColumnIndex("holder_name")),
-                    result.getDouble(result.getColumnIndex("balance"))
-            );
+            try {
+                return new Account(
+                        result.getString(result.getColumnIndexOrThrow("account_no")),
+                        result.getString(result.getColumnIndexOrThrow("bank_name")),
+                        result.getString(result.getColumnIndexOrThrow("holder_name")),
+                        result.getDouble(result.getColumnIndexOrThrow("balance"))
+                );
+            } catch (Exception e){
+                throw new InvalidAccountException("No such account with account number "+ accountNo);
+            }
         }else {
             throw new InvalidAccountException("No such account with account number "+ accountNo);
         }

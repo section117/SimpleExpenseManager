@@ -33,18 +33,15 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-      
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
+  
+    - name: checkout
+      uses: actions/checkout@v3
 
-      - name: Local unit tests
-        run: ./gradlew test --info --stacktrace
+    - name: Local unit tests
+      run: ./gradlew test --info --stacktrace
 
-      - name: Instrumentation tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 28
-          script: ./gradlew connectedAndroidTest
+    - name: Instrumentation tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 28
+        script: ./gradlew connectedAndroidTest

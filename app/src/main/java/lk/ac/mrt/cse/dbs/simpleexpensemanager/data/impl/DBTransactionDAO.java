@@ -58,13 +58,17 @@ public class DBTransactionDAO implements TransactionDAO {
     private List<Transaction> getTransactionsListFromCursor(Cursor result) {
 
         Map<String,Integer> column_indexes = new HashMap<>();
-        column_indexes.put("id",result.getColumnIndex("id"));
-        column_indexes.put("date",result.getColumnIndex("date"));
-        column_indexes.put("expense_type",result.getColumnIndex("expense_type"));
-        column_indexes.put("amount",result.getColumnIndex("amount"));
-        column_indexes.put("account_id",result.getColumnIndex("account_id"));
-
         List<Transaction> transactions = new LinkedList<>();
+        try {
+            column_indexes.put("id",result.getColumnIndexOrThrow("id"));
+            column_indexes.put("date",result.getColumnIndexOrThrow("date"));
+            column_indexes.put("expense_type",result.getColumnIndexOrThrow("expense_type"));
+            column_indexes.put("amount",result.getColumnIndexOrThrow("amount"));
+            column_indexes.put("account_id",result.getColumnIndexOrThrow("account_id"));
+        } catch (Exception e) {
+            return transactions;
+        }
+
         for (result.moveToFirst(); !result.isAfterLast(); result.moveToNext()) {
             try {
                 transactions.add(new Transaction(

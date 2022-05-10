@@ -45,12 +45,16 @@ public class DBAccountDAO implements AccountDAO {
         Cursor result = db.rawQuery("SELECT * FROM accounts", null);
 
         Map<String,Integer> column_indexes = new HashMap<>();
-        column_indexes.put("account_no",result.getColumnIndex("account_no"));
-        column_indexes.put("bank_name",result.getColumnIndex("bank_name"));
-        column_indexes.put("holder_name",result.getColumnIndex("holder_name"));
-        column_indexes.put("balance",result.getColumnIndex("balance"));
-
         List<Account> accounts = new LinkedList<>();
+        try {
+            column_indexes.put("account_no",result.getColumnIndexOrThrow("account_no"));
+            column_indexes.put("bank_name",result.getColumnIndexOrThrow("bank_name"));
+            column_indexes.put("holder_name",result.getColumnIndexOrThrow("holder_name"));
+            column_indexes.put("balance",result.getColumnIndexOrThrow("balance"));
+        } catch (Exception e) {
+            return accounts;
+        }
+
         for (result.moveToFirst(); !result.isAfterLast(); result.moveToNext()) {
             accounts.add(new Account(
                     result.getString(column_indexes.get("account_no")),
